@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Compiler</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(45deg, #151515, #000080);
+            color: #ff0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 300px;
+            background-color: #222;
+            padding: 20px;
+            border: 2px solid #ffcc00;
+            border-radius: 10px;
+        }
+
+        .container {
+            flex: 1;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .timer {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #fff;
+            font-size: 24px;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: calc(100% - 22px);
+            height: 300px;
+            padding: 10px;
+            background-color: #000;
+            color: #ff0;
+            border: 1px solid #333;
+            border-radius: 5px;
+            resize: vertical;
+            font-size: 18px;
+            font-family: monospace;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #ff0;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #ffe066;
+        }
+
+        h2 {
+            font-size: 28px;
+            margin-top: 20px;
+        }
+
+        pre {
+            background-color: #000;
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 18px;
+            color: #ff0;
+            font-family: monospace;
+        }
+
+        .sidebar h2 {
+            color: #ffcc00; /* Yellow color for sidebar heading */
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .sidebar p {
+            color: #fff; /* White color for sidebar text */
+            font-size: 18px;
+            line-height: 1.5;
+        }
+
+        .date-checkbox {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .date-checkbox input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        .date-checkbox label {
+            font-size: 18px;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2 id="current-date">Today's Date</h2>
+        <div class="date-checkbox">
+            <input type="checkbox" id="complete-checkbox">
+            <label for="complete-checkbox">Mark as complete</label>
+        </div>
+        <div class="problem-statement">
+            <h2>Python Problem Statement</h2>
+            <p>This is a practice python problem. You can code in this textarea and get the output below :</p>
+            <p>Write a Python function to check if a given string is a palindrome. A palindrome is a word, phrase, number, or other sequence of characters that reads the same forward and backward, ignoring spaces, punctuation, and capitalization.</p>
+        </div>
+    </div>
+    <div class="container">
+        <h1>Practice Python</h1>
+        <div class="timer" id="timer">00:00:00</div> <!-- Added timer -->
+        <form id="compiler-form">
+            <textarea name="code" rows="10" placeholder="Enter your Python code here"></textarea><br>
+            <textarea name="input" rows="5" placeholder="Enter input text (optional)"></textarea><br>
+            <button type="submit">Compile & Run</button>
+        </form>
+        <h2>Output</h2>
+        <pre id="output"></pre>
+    </div>
+
+    <script>
+        const form = document.getElementById('compiler-form');
+        const output = document.getElementById('output');
+        const timer = document.getElementById('timer'); // Added timer
+        const completeCheckbox = document.getElementById('complete-checkbox');
+        const currentDate = document.getElementById('current-date');
+
+        // Set today's date
+        const today = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        currentDate.textContent = today.toLocaleDateString('en-US', options);
+
+        completeCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                // Code to mark the problem statement as complete
+                console.log('Problem statement marked as complete.');
+            } else {
+                // Code to unmark the problem statement
+                console.log('Problem statement marked as incomplete.');
+            }
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const response = await fetch('/compile_run', {
+                method: 'POST',
+                body: formData
+            });
+            const text = await response.text();
+            output.textContent = text;
+        });
+
+        // Timer functionality
+        let startTime;
+        let timerInterval;
+
+        function startTimer() {
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        function updateTimer() {
+            const elapsedTime = Date.now() - startTime;
+            const hours = Math.floor(elapsedTime / (1000 * 60 * 60));
+            const minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
+            timer.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        startTimer(); // Start the timer when the page loads
+    </script>
+</body>
+</html>
